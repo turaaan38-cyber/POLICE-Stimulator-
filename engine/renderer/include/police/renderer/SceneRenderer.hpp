@@ -3,6 +3,7 @@
 #include "police/renderer/GLApi.hpp"
 #include "police/physics/PhysicsWorld.hpp"
 #include "police/vehicles/VehicleController.hpp"
+#include "police/scene/Scene.hpp"
 namespace police::renderer {
 class SceneRenderer final {
 public:
@@ -14,6 +15,8 @@ public:
 private:
  police::vehicles::PatrolVehicleController vehicle_{};
  police::physics::PhysicsWorld collision_world_{};
+ police::scene::Scene scene_{};
+ police::scene::Entity patrol_car_entity_{};
  double camera_orbit_degrees_{0.0}; double pitch_degrees_{18.0};
  GLApi gl_{};
  GLuint program_{0},city_vao_{0},city_vbo_{0},vehicle_vao_{0},vehicle_vbo_{0};

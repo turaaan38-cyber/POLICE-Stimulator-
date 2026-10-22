@@ -88,6 +88,11 @@ SceneRenderer::SceneRenderer(const police::platform::Window& window){
   collision_world_.add_static_box({{x-3.0,ha*0.5,z-2.6},{2.7,ha*0.5,2.9}});
   collision_world_.add_static_box({{x+3.2,hb*0.5,z+2.8},{2.1,hb*0.5,2.0}});
  }
+ patrol_car_entity_ = scene_.create_entity("VEH_Patrol_Blockout");
+ police::scene::Transform patrol_transform;
+ patrol_transform.position = {vehicle_.state().x, 0.0, vehicle_.state().z};
+ patrol_transform.rotation_degrees.y = vehicle_.state().heading_degrees;
+ scene_.add_transform(patrol_car_entity_, patrol_transform);
  upload_mesh(gl_,build_patrol_car(),vehicle_vao_,vehicle_vbo_,vehicle_vertex_count_);
  police::core::log(police::core::LogLevel::Info,"OpenGL 3.3 renderer initialized; city vertices: "+std::to_string(city_vertex_count_));
 }
@@ -96,6 +101,10 @@ void SceneRenderer::update(const police::platform::Window&w,double dt){
  police::vehicles::VehicleInput input;input.throttle=w.key_down(police::platform::Key::W);input.brake_or_reverse=w.key_down(police::platform::Key::S);
  input.steer_left=w.key_down(police::platform::Key::A);input.steer_right=w.key_down(police::platform::Key::D);input.handbrake=w.key_down(police::platform::Key::Space);
  input.emergency_lights_pressed=w.key_down(police::platform::Key::L);input.siren_pressed=w.key_down(police::platform::Key::H);vehicle_.update(input,dt,&collision_world_);
+  auto& patrol_transform = scene_.transform(patrol_car_entity_);
+  const auto& vehicle_state = vehicle_.state();
+  patrol_transform.position = {vehicle_state.x, 0.0, vehicle_state.z};
+  patrol_transform.rotation_degrees.y = vehicle_state.heading_degrees;
  const double s=std::clamp(dt,0.0,0.05);
  if(w.key_down(police::platform::Key::Left))camera_orbit_degrees_-=65.0*s;if(w.key_down(police::platform::Key::Right))camera_orbit_degrees_+=65.0*s;
  if(w.key_down(police::platform::Key::Up))pitch_degrees_=std::max(4.0,pitch_degrees_-35.0*s);if(w.key_down(police::platform::Key::Down))pitch_degrees_=std::min(45.0,pitch_degrees_+35.0*s);
@@ -104,13 +113,15 @@ void SceneRenderer::update(const police::platform::Window&w,double dt){
 void SceneRenderer::draw(const police::platform::Window&w)const{
  const int width=std::max(1,w.framebuffer_width()),height=std::max(1,w.framebuffer_height());glViewport(0,0,width,height);
  glClearColor(.49F,.67F,.82F,1);glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);glEnable(GL_DEPTH_TEST);glDisable(GL_CULL_FACE);
- const auto&s=vehicle_.state();const double camera_heading=s.heading_degrees+camera_orbit_degrees_,a=camera_heading*pi/180.0;
- const double cam_x=s.x-std::sin(a)*9.0,cam_z=s.z+std::cos(a)*9.0,cam_y=5.5;
+ const auto&s=vehicle_.state();
+  const auto& patrol_transform = scene_.transform(patrol_car_entity_);
+  const double camera_heading=patrol_transform.rotation_degrees.y+camera_orbit_degrees_,a=camera_heading*pi/180.0;
+ const double cam_x=patrol_transform.position.x-std::sin(a)*9.0,cam_z=patrol_transform.position.z+std::cos(a)*9.0,cam_y=5.5;
  const Matrix view=multiply(rotate_y(camera_heading),multiply(rotate_x(pitch_degrees_),translation(-cam_x,-cam_y,-cam_z)));
  const Matrix projection=perspective(double(width)/double(height)),city_mvp=multiply(projection,view);
  gl_.UseProgram(program_);gl_.Uniform1f(uniform_light_phase_,GLfloat(w.time_seconds()));gl_.Uniform1f(uniform_lights_enabled_,s.emergency_lights?1.0F:0.0F);
  gl_.UniformMatrix4fv(uniform_mvp_,1,GL_FALSE,city_mvp.data());gl_.BindVertexArray(city_vao_);gl_.DrawArrays(triangles,0,city_vertex_count_);
- const Matrix car_world=multiply(translation(s.x,0.0,s.z),rotate_y(-s.heading_degrees)),car_mvp=multiply(city_mvp,car_world);
+ const Matrix car_world=multiply(translation(patrol_transform.position.x,patrol_transform.position.y,patrol_transform.position.z),rotate_y(-patrol_transform.rotation_degrees.y)),car_mvp=multiply(city_mvp,car_world);
  gl_.UniformMatrix4fv(uniform_mvp_,1,GL_FALSE,car_mvp.data());gl_.BindVertexArray(vehicle_vao_);gl_.DrawArrays(triangles,0,vehicle_vertex_count_);gl_.BindVertexArray(0);
 }
 } // namespace police::renderer
