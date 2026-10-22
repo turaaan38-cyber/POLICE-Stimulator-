@@ -44,7 +44,7 @@ int main() {
     check(!dispatch.mark_on_scene(id, {10.0,0.0,0.0}, -1.0), "rejects a negative arrival radius");
     check(dispatch.mark_on_scene(id, {14.0,0.0,0.0}, 5.0), "marks arrival within radius");
     check(!dispatch.accept(id), "cannot accept an already active callout twice");
-    check(!dispatch.cancel(id) == false, "can cancel an active callout");
+    check(dispatch.cancel(id), "can cancel an active callout");
 
     check(dispatch.accept(second), "next callout becomes available after cancellation");
     check(dispatch.mark_on_scene(second, {25.0,0.0,0.0}, 1.0), "can arrive at second callout");
