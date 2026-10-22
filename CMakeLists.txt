@@ -1,78 +1,59 @@
 cmake_minimum_required(VERSION 3.20)
-project(POLICE-Stimulator VERSION 0.1.0 LANGUAGES CXX)
-
+project(POLICE-Stimulator VERSION 0.2.0 LANGUAGES CXX)
 option(POLICE_BUILD_VIEWER "Build the interactive OpenGL 3D blockout viewer" ON)
 option(POLICE_FETCH_GLFW "Fetch the pinned GLFW release when the viewer is enabled" ON)
 option(POLICE_ENABLE_WARNINGS "Enable useful compiler warnings" ON)
-
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
-
 include(CTest)
-
 if(POLICE_ENABLE_WARNINGS)
-    if(MSVC)
-        add_compile_options(/W4 /permissive-)
-    else()
-        add_compile_options(-Wall -Wextra -Wpedantic)
-    endif()
+ if(MSVC)
+  add_compile_options(/W4 /permissive-)
+ else()
+  add_compile_options(-Wall -Wextra -Wpedantic)
+ endif()
 endif()
-
 add_library(police_core engine/core/src/Log.cpp)
 target_include_directories(police_core PUBLIC engine/core/include)
-
-add_library(patrolscript
-    language/src/token.cpp
-    language/src/lexer.cpp
-    language/src/parser.cpp
-    language/src/runtime.cpp
-)
+add_library(patrolscript language/src/token.cpp language/src/lexer.cpp language/src/parser.cpp language/src/runtime.cpp)
 target_include_directories(patrolscript PUBLIC language/include)
 target_compile_features(patrolscript PUBLIC cxx_std_20)
-
 add_executable(patrolc language/src/cli.cpp)
 target_link_libraries(patrolc PRIVATE patrolscript)
-
+add_library(police_vehicle game/vehicles/src/VehicleController.cpp)
+target_include_directories(police_vehicle PUBLIC game/vehicles/include)
+target_compile_features(police_vehicle PUBLIC cxx_std_20)
 if(BUILD_TESTING)
-    add_executable(patrol_tests tests/patrol_tests.cpp)
-    target_link_libraries(patrol_tests PRIVATE patrolscript)
-    add_test(NAME patrol_unit_tests COMMAND patrol_tests)
-    add_test(NAME patrolscript_example_syntax
-        COMMAND patrolc --check "${CMAKE_CURRENT_SOURCE_DIR}/language/examples/first_patrol.patrol")
-    add_test(NAME patrolscript_example_execution
-        COMMAND patrolc "${CMAKE_CURRENT_SOURCE_DIR}/language/examples/first_patrol.patrol")
+ add_executable(patrol_tests tests/patrol_tests.cpp)
+ target_link_libraries(patrol_tests PRIVATE patrolscript)
+ add_test(NAME patrol_unit_tests COMMAND patrol_tests)
+ add_test(NAME patrolscript_example_syntax COMMAND patrolc --check "${CMAKE_CURRENT_SOURCE_DIR}/language/examples/first_patrol.patrol")
+ add_test(NAME patrolscript_example_execution COMMAND patrolc "${CMAKE_CURRENT_SOURCE_DIR}/language/examples/first_patrol.patrol")
+ add_executable(vehicle_tests tests/vehicle_tests.cpp)
+ target_link_libraries(vehicle_tests PRIVATE police_vehicle)
+ add_test(NAME vehicle_controller_tests COMMAND vehicle_tests)
 endif()
-
 if(POLICE_BUILD_VIEWER)
-    if(POLICE_FETCH_GLFW)
-        include(FetchContent)
-        set(GLFW_BUILD_DOCS OFF CACHE BOOL "" FORCE)
-        set(GLFW_BUILD_TESTS OFF CACHE BOOL "" FORCE)
-        set(GLFW_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
-        set(GLFW_INSTALL OFF CACHE BOOL "" FORCE)
-        FetchContent_Declare(glfw
-            URL https://github.com/glfw/glfw/archive/refs/tags/3.5.1.tar.gz
-            URL_HASH SHA256=5234f4f29473e9a06bc7847d8371858dd135d38466eeeaa652fdc9f8f9ff0c20
-            DOWNLOAD_EXTRACT_TIMESTAMP TRUE
-        )
-        FetchContent_MakeAvailable(glfw)
-    else()
-        find_package(glfw3 3.5.1 CONFIG REQUIRED)
-    endif()
-    find_package(OpenGL REQUIRED)
-
-    add_library(police_platform engine/platform/src/Window.cpp)
-    target_include_directories(police_platform PUBLIC engine/platform/include)
-    target_link_libraries(police_platform PUBLIC police_core glfw)
-
-    add_library(police_renderer
-        engine/renderer/src/GLApi.cpp
-        engine/renderer/src/SceneRenderer.cpp
-    )
-    target_include_directories(police_renderer PUBLIC engine/renderer/include)
-    target_link_libraries(police_renderer PUBLIC police_platform OpenGL::GL)
-
-    add_executable(POLICE-Stimulator game/src/main.cpp)
-    target_link_libraries(POLICE-Stimulator PRIVATE police_renderer)
+ if(POLICE_FETCH_GLFW)
+  include(FetchContent)
+  set(GLFW_BUILD_DOCS OFF CACHE BOOL "" FORCE)
+  set(GLFW_BUILD_TESTS OFF CACHE BOOL "" FORCE)
+  set(GLFW_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
+  set(GLFW_INSTALL OFF CACHE BOOL "" FORCE)
+  FetchContent_Declare(glfw URL https://github.com/glfw/glfw/archive/refs/tags/3.5.1.tar.gz
+   URL_HASH SHA256=5234f4f29473e9a06bc7847d8371858dd135d38466eeeaa652fdc9f8f9ff0c20 DOWNLOAD_EXTRACT_TIMESTAMP TRUE)
+  FetchContent_MakeAvailable(glfw)
+ else()
+  find_package(glfw3 3.5.1 CONFIG REQUIRED)
+ endif()
+ find_package(OpenGL REQUIRED)
+ add_library(police_platform engine/platform/src/Window.cpp)
+ target_include_directories(police_platform PUBLIC engine/platform/include)
+ target_link_libraries(police_platform PUBLIC police_core glfw)
+ add_library(police_renderer engine/renderer/src/GLApi.cpp engine/renderer/src/SceneRenderer.cpp)
+ target_include_directories(police_renderer PUBLIC engine/renderer/include)
+ target_link_libraries(police_renderer PUBLIC police_platform OpenGL::GL police_vehicle)
+ add_executable(POLICE-Stimulator game/src/main.cpp)
+ target_link_libraries(POLICE-Stimulator PRIVATE police_renderer)
 endif()
