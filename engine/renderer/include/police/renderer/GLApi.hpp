@@ -1,11 +1,26 @@
 #pragma once
-#include <GLFW/glfw3.h>
+#include "police/platform/Window.hpp"
 #include <cstddef>
+#if defined(_WIN32)
+#ifndef WIN32_LEAN_AND_MEAN
+#define WIN32_LEAN_AND_MEAN
+#endif
+#ifndef NOMINMAX
+#define NOMINMAX
+#endif
+#include <windows.h>
+#include <GL/gl.h>
+#elif defined(__APPLE__)
+#include <OpenGL/gl.h>
+#else
+#include <GL/gl.h>
+#endif
 namespace police::renderer {
 #ifndef APIENTRY
 #define APIENTRY
 #endif
-using GLchar=char; using GLsizeiptr=std::ptrdiff_t;
+using GLchar=char;
+using GLsizeiptr=std::ptrdiff_t;
 struct GLApi final {
  using GenVertexArraysFn=void(APIENTRY*)(GLsizei,GLuint*); using BindVertexArrayFn=void(APIENTRY*)(GLuint);
  using DeleteVertexArraysFn=void(APIENTRY*)(GLsizei,const GLuint*); using GenBuffersFn=void(APIENTRY*)(GLsizei,GLuint*);
@@ -30,6 +45,6 @@ struct GLApi final {
  GetProgramivFn GetProgramiv{}; GetProgramInfoLogFn GetProgramInfoLog{}; DeleteProgramFn DeleteProgram{};
  UseProgramFn UseProgram{}; GetUniformLocationFn GetUniformLocation{}; UniformMatrix4fvFn UniformMatrix4fv{};
  Uniform1fFn Uniform1f{}; DrawArraysFn DrawArrays{};
- void load();
+ void load(const police::platform::Window& window);
 };
 } // namespace police::renderer

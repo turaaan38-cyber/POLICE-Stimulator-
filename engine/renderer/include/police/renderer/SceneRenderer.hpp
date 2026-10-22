@@ -5,7 +5,7 @@
 namespace police::renderer {
 class SceneRenderer final {
 public:
- SceneRenderer(); ~SceneRenderer();
+ explicit SceneRenderer(const police::platform::Window& window); ~SceneRenderer();
  SceneRenderer(const SceneRenderer&)=delete; SceneRenderer& operator=(const SceneRenderer&)=delete;
  void update(const police::platform::Window& window,double delta_seconds);
  void draw(const police::platform::Window& window) const;

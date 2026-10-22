@@ -1,7 +1,6 @@
 #include "police/core/Log.hpp"
 #include "police/platform/Window.hpp"
 #include "police/renderer/SceneRenderer.hpp"
-#include <GLFW/glfw3.h>
 #include <cmath>
 #include <exception>
 #include <iomanip>
@@ -14,10 +13,10 @@ int main(int argc,char**argv){
   if(arg=="--version"){std::cout<<"POLICE-Stimulator 0.2.0-dev\n";return 0;}std::cerr<<"Unknown argument: "<<arg<<" (use --help)\n";return 2;}
  try{
   police::core::log(police::core::LogLevel::Info,"Starting POLICE-Stimulator 0.2.0-dev");
-  police::platform::Window window(1280,720,"POLICE-Stimulator | patrol vehicle blockout");police::renderer::SceneRenderer renderer;
+  police::platform::Window window(1280,720,"POLICE-Stimulator | patrol vehicle blockout");police::renderer::SceneRenderer renderer(window);
   double previous=window.time_seconds(),elapsed=0.0;unsigned frames=0;
   while(!window.should_close()){
-   window.poll_events();if(window.key_down(GLFW_KEY_ESCAPE))window.request_close();
+   window.poll_events();if(window.key_down(police::platform::Key::Escape))window.request_close();
    const double now=window.time_seconds(),dt=now-previous;previous=now;
    renderer.update(window,dt);renderer.draw(window);window.swap_buffers();++frames;elapsed+=dt;
    if(elapsed>=1.0){const double fps=double(frames)/elapsed;const auto&v=renderer.vehicle_state();std::ostringstream title;
