@@ -1,0 +1,31 @@
+# CMake and compiler outputs
+/build/
+/cmake-build-*/
+CMakeFiles/
+CMakeCache.txt
+cmake_install.cmake
+CTestTestfile.cmake
+Makefile
+*.o
+*.obj
+*.a
+*.lib
+*.so
+*.dll
+*.dylib
+*.exe
+
+# Generated logs and debugger artifacts
+*.log
+core
+core.*
+
+# Blender local/editor backups
+*.blend1
+*.blend2
+
+# IDE/editor files
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db

@@ -1,0 +1,13 @@
+// PatrolScript 0.1: variables, functions, loops, branches, and output.
+fn points_for_stop(speed_kmh) {
+    if (speed_kmh > 80) { return 25; } else { return 10; }
+}
+let total_points = 0;
+let speed = 92;
+let calls = 3;
+while (calls > 0) {
+    total_points = total_points + points_for_stop(speed);
+    calls = calls - 1;
+}
+print "PatrolScript running";
+print total_points;
