@@ -1,4 +1,5 @@
 #include "police/vehicles/VehicleController.hpp"
+#include "police/physics/PhysicsWorld.hpp"
 #include <cmath>
 #include <iostream>
 namespace { int failures=0; void check(bool ok,const char* label){if(ok)std::cout<<"[PASS] "<<label<<'\n';else{std::cerr<<"[FAIL] "<<label<<'\n';++failures;}} }
@@ -20,5 +21,14 @@ int main(){
    car.update(VehicleInput{},.016);car.update(in,.016);check(!car.state().siren_enabled,"siren state toggles off");}
  { PatrolVehicleController car;VehicleInput in;in.throttle=true;double x=car.state().x,z=car.state().z;car.update(in,100.0);
    check(car.state().speed_mps<1.0,"large delta is clamped");check(std::abs(car.state().x-x)<.1&&std::abs(car.state().z-z)<.1,"large delta cannot teleport vehicle");}
+ {
+   police::physics::PhysicsWorld world;
+   world.add_static_box({{2.1,0.75,-7.0},{3.0,0.75,0.5}});
+   PatrolVehicleController car;
+   VehicleInput in; in.throttle=true;
+   for(int i=0;i<100;++i)car.update(in,0.05,&world);
+   check(std::abs(car.state().z+4.4)<1e-7,"vehicle collision keeps its body outside a static wall");
+   check(std::abs(car.state().speed_mps)<1e-8,"vehicle collision removes forward speed in arcade prototype");
+ }
  if(failures){std::cerr<<failures<<" vehicle test(s) failed\n";return 1;}std::cout<<"All vehicle controller tests passed\n";return 0;
 }

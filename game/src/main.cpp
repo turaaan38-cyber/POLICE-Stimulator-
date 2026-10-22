@@ -9,7 +9,7 @@
 #include <string>
 int main(int argc,char**argv){
  if(argc>1){const std::string arg=argv[1];if(arg=="--help"||arg=="-h"){
-  std::cout<<"POLICE-Stimulator 0.2.0 vehicle blockout\nW: throttle | S: brake/reverse | A/D: steer | Space: handbrake\nL: emergency lights | H: siren state | arrow keys: orbit camera | Escape: quit\nArcade prototype; collision and siren audio are not implemented yet.\n";return 0;}
+  std::cout<<"POLICE-Stimulator 0.2.0 vehicle blockout\nW: throttle | S: brake/reverse | A/D: steer | Space: handbrake\nL: emergency lights | H: siren state | arrow keys: orbit camera | Escape: quit\nArcade prototype; static building collision exists, but siren audio is not implemented.\n";return 0;}
   if(arg=="--version"){std::cout<<"POLICE-Stimulator 0.2.0-dev\n";return 0;}std::cerr<<"Unknown argument: "<<arg<<" (use --help)\n";return 2;}
  try{
   police::core::log(police::core::LogLevel::Info,"Starting POLICE-Stimulator 0.2.0-dev");

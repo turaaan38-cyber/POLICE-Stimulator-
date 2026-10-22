@@ -11,12 +11,12 @@ permissions:
 
 jobs:
   build-test:
-    name: \${{ matrix.os }} / CMake / CTest
+    name: ${{ matrix.os }} / CMake / CTest
     strategy:
       fail-fast: false
       matrix:
         os: [ubuntu-24.04, windows-latest, macos-latest]
-    runs-on: \${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
     steps:
       - name: Check out source
         uses: actions/checkout@v4

@@ -54,6 +54,6 @@ ctest --test-dir build-headless -C Release --output-on-failure
 
 ## Current limitations (not yet implemented)
 
-This is an early blockout, not a completed simulator. The renderer does not yet load GLB files; no imported Blender model is drawn by runtime. Collision shapes, rigid-body vehicle dynamics, audio output, character movement/animation, traffic and pedestrian AI, dispatch/callouts, police interactions, mission progression, save data, and full UI are not implemented. The vehicle is controllable but does not collide with buildings or other vehicles. Linux native support currently targets X11/GLX; pure Wayland support is not yet implemented.
+This is an early blockout, not a completed simulator. The renderer does not yet load GLB files; no imported Blender model is drawn by runtime. Static AABB collision is implemented for the blockout buildings and arcade patrol car. Rigid-body vehicle dynamics, rotation-aware collision, dynamic-vs-dynamic contacts, audio output, character movement/animation, traffic and pedestrian AI, dispatch/callouts, police interactions, mission progression, save data, and full UI are not implemented. Vehicle collision is simplified and is not a tire/friction physics model. Linux native support currently targets X11/GLX; pure Wayland support is not yet implemented.
 
 The platform layer and core game systems are original project code. Cocoa, Win32, X11/GLX and OpenGL are used as system APIs/drivers, rather than bundling a third-party windowing or game-engine library.
