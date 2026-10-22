@@ -1,0 +1,3 @@
+## First collision layer
+
+The `engine/physics` module owns a small axis-aligned bounding-box (AABB) collision world. Static colliders use a center and positive half-extents. Movement is resolved by axes and clamps against static boxes, permitting sliding along walls. Invalid/non-finite coordinates are rejected. This is kinematic collision detection/resolution, not a rigid-body solver: rotation-aware collision, dynamic-to-dynamic contacts, mass, suspension, tire friction, impulses and pedestrian capsules are not implemented. The city blockout registers its generated building boxes, and the patrol vehicle uses a conservative fixed AABB.

@@ -80,14 +80,22 @@ void upload_mesh(GLApi&g,const std::vector<Vertex>&v,GLuint&vao,GLuint&vbo,GLsiz
 }
 SceneRenderer::SceneRenderer(const police::platform::Window& window){
  gl_.load(window);program_=make_program(gl_);uniform_mvp_=gl_.GetUniformLocation(program_,"m");uniform_light_phase_=gl_.GetUniformLocation(program_,"lightPhase");uniform_lights_enabled_=gl_.GetUniformLocation(program_,"lightsEnabled");
- upload_mesh(gl_,build_city(),city_vao_,city_vbo_,city_vertex_count_);upload_mesh(gl_,build_patrol_car(),vehicle_vao_,vehicle_vbo_,vehicle_vertex_count_);
+ upload_mesh(gl_,build_city(),city_vao_,city_vbo_,city_vertex_count_);
+ for(int xb=-3;xb<=2;++xb)for(int zb=-3;zb<=2;++zb){
+  const double x=xb*24.0+12.0,z=zb*24.0+12.0;
+  const int seed=(xb+4)*17+(zb+4)*29;
+  const double ha=5.0+(seed*7)%13,hb=6.0+(seed*3+5)%17;
+  collision_world_.add_static_box({{x-3.0,ha*0.5,z-2.6},{2.7,ha*0.5,2.9}});
+  collision_world_.add_static_box({{x+3.2,hb*0.5,z+2.8},{2.1,hb*0.5,2.0}});
+ }
+ upload_mesh(gl_,build_patrol_car(),vehicle_vao_,vehicle_vbo_,vehicle_vertex_count_);
  police::core::log(police::core::LogLevel::Info,"OpenGL 3.3 renderer initialized; city vertices: "+std::to_string(city_vertex_count_));
 }
 SceneRenderer::~SceneRenderer(){if(city_vbo_)gl_.DeleteBuffers(1,&city_vbo_);if(city_vao_)gl_.DeleteVertexArrays(1,&city_vao_);if(vehicle_vbo_)gl_.DeleteBuffers(1,&vehicle_vbo_);if(vehicle_vao_)gl_.DeleteVertexArrays(1,&vehicle_vao_);if(program_)gl_.DeleteProgram(program_);}
 void SceneRenderer::update(const police::platform::Window&w,double dt){
  police::vehicles::VehicleInput input;input.throttle=w.key_down(police::platform::Key::W);input.brake_or_reverse=w.key_down(police::platform::Key::S);
  input.steer_left=w.key_down(police::platform::Key::A);input.steer_right=w.key_down(police::platform::Key::D);input.handbrake=w.key_down(police::platform::Key::SPACE);
- input.emergency_lights_pressed=w.key_down(police::platform::Key::L);input.siren_pressed=w.key_down(police::platform::Key::H);vehicle_.update(input,dt);
+ input.emergency_lights_pressed=w.key_down(police::platform::Key::L);input.siren_pressed=w.key_down(police::platform::Key::H);vehicle_.update(input,dt,&collision_world_);
  const double s=std::clamp(dt,0.0,0.05);
  if(w.key_down(police::platform::Key::LEFT))camera_orbit_degrees_-=65.0*s;if(w.key_down(police::platform::Key::Right))camera_orbit_degrees_+=65.0*s;
  if(w.key_down(police::platform::Key::Up))pitch_degrees_=std::max(4.0,pitch_degrees_-35.0*s);if(w.key_down(police::platform::Key::DOWN))pitch_degrees_=std::min(45.0,pitch_degrees_+35.0*s);

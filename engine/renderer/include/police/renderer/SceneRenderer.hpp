@@ -1,6 +1,7 @@
 #pragma once
 #include "police/platform/Window.hpp"
 #include "police/renderer/GLApi.hpp"
+#include "police/physics/PhysicsWorld.hpp"
 #include "police/vehicles/VehicleController.hpp"
 namespace police::renderer {
 class SceneRenderer final {
@@ -12,6 +13,7 @@ public:
  [[nodiscard]] const police::vehicles::VehicleState& vehicle_state() const noexcept { return vehicle_.state(); }
 private:
  police::vehicles::PatrolVehicleController vehicle_{};
+ police::physics::PhysicsWorld collision_world_{};
  double camera_orbit_degrees_{0.0}; double pitch_degrees_{18.0};
  GLApi gl_{};
  GLuint program_{0},city_vao_{0},city_vbo_{0},vehicle_vao_{0},vehicle_vbo_{0};

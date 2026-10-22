@@ -1,4 +1,5 @@
 #include "police/vehicles/VehicleController.hpp"
+#include "police/physics/PhysicsWorld.hpp"
 #include <algorithm>
 #include <cmath>
 namespace police::vehicles { namespace {
@@ -11,7 +12,7 @@ double approach_zero(const double v,const double amount) {
  return 0.0;
 }
 }
-void PatrolVehicleController::update(const VehicleInput& input,const double delta_seconds) {
+void PatrolVehicleController::update(const VehicleInput& input,const double delta_seconds,const police::physics::PhysicsWorld* collision_world) {
  const double dt=std::clamp(delta_seconds,0.0,0.05);
  if(input.emergency_lights_pressed&&!previous_lights_key_)state_.emergency_lights=!state_.emergency_lights;
  if(input.siren_pressed&&!previous_siren_key_)state_.siren_enabled=!state_.siren_enabled;
@@ -36,6 +37,11 @@ void PatrolVehicleController::update(const VehicleInput& input,const double delt
   while(state_.heading_degrees< -180.0)state_.heading_degrees+=360.0;
  }
  const double a=state_.heading_degrees/degrees_per_radian;
- state_.x+=std::sin(a)*state_.speed_mps*dt; state_.z-=std::cos(a)*state_.speed_mps*dt;
+ const double dx=std::sin(a)*state_.speed_mps*dt,dz=-std::cos(a)*state_.speed_mps*dt;
+ if(collision_world!=nullptr){
+  const auto resolved=collision_world->move_box({state_.x,0.75,state_.z},{0.95,0.75,2.10},{dx,0.0,dz});
+  state_.x=resolved.position.x;state_.z=resolved.position.z;
+  if(resolved.collided())state_.speed_mps=0.0;
+ }else{state_.x+=dx;state_.z+=dz;}
 }
 } // namespace police::vehicles

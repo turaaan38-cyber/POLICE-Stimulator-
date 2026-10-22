@@ -1,4 +1,5 @@
 #pragma once
+namespace police::physics { class PhysicsWorld; }
 namespace police::vehicles {
 struct VehicleInput final {
  bool throttle{false}; bool brake_or_reverse{false}; bool steer_left{false}; bool steer_right{false};
@@ -11,7 +12,7 @@ struct VehicleState final {
 class PatrolVehicleController final {
 public:
  [[nodiscard]] const VehicleState& state() const noexcept { return state_; }
- void update(const VehicleInput& input, double delta_seconds);
+ void update(const VehicleInput& input, double delta_seconds, const police::physics::PhysicsWorld* collision_world = nullptr);
 private:
  VehicleState state_{}; bool previous_lights_key_{false}; bool previous_siren_key_{false};
 };
