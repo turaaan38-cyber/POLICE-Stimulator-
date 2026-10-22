@@ -94,11 +94,11 @@ SceneRenderer::SceneRenderer(const police::platform::Window& window){
 SceneRenderer::~SceneRenderer(){if(city_vbo_)gl_.DeleteBuffers(1,&city_vbo_);if(city_vao_)gl_.DeleteVertexArrays(1,&city_vao_);if(vehicle_vbo_)gl_.DeleteBuffers(1,&vehicle_vbo_);if(vehicle_vao_)gl_.DeleteVertexArrays(1,&vehicle_vao_);if(program_)gl_.DeleteProgram(program_);}
 void SceneRenderer::update(const police::platform::Window&w,double dt){
  police::vehicles::VehicleInput input;input.throttle=w.key_down(police::platform::Key::W);input.brake_or_reverse=w.key_down(police::platform::Key::S);
- input.steer_left=w.key_down(police::platform::Key::A);input.steer_right=w.key_down(police::platform::Key::D);input.handbrake=w.key_down(police::platform::Key::SPACE);
+ input.steer_left=w.key_down(police::platform::Key::A);input.steer_right=w.key_down(police::platform::Key::D);input.handbrake=w.key_down(police::platform::Key::Space);
  input.emergency_lights_pressed=w.key_down(police::platform::Key::L);input.siren_pressed=w.key_down(police::platform::Key::H);vehicle_.update(input,dt,&collision_world_);
  const double s=std::clamp(dt,0.0,0.05);
- if(w.key_down(police::platform::Key::LEFT))camera_orbit_degrees_-=65.0*s;if(w.key_down(police::platform::Key::Right))camera_orbit_degrees_+=65.0*s;
- if(w.key_down(police::platform::Key::Up))pitch_degrees_=std::max(4.0,pitch_degrees_-35.0*s);if(w.key_down(police::platform::Key::DOWN))pitch_degrees_=std::min(45.0,pitch_degrees_+35.0*s);
+ if(w.key_down(police::platform::Key::Left))camera_orbit_degrees_-=65.0*s;if(w.key_down(police::platform::Key::Right))camera_orbit_degrees_+=65.0*s;
+ if(w.key_down(police::platform::Key::Up))pitch_degrees_=std::max(4.0,pitch_degrees_-35.0*s);if(w.key_down(police::platform::Key::Down))pitch_degrees_=std::min(45.0,pitch_degrees_+35.0*s);
  while(camera_orbit_degrees_>=180.0)camera_orbit_degrees_-=360.0;while(camera_orbit_degrees_<-180.0)camera_orbit_degrees_+=360.0;
 }
 void SceneRenderer::draw(const police::platform::Window&w)const{

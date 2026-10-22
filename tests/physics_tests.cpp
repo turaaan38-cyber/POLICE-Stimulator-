@@ -6,7 +6,7 @@ namespace {int failures=0;void check(bool ok,const char*label){if(ok)std::cout<<
 template<class F>void invalid(F&&f,const char*label){try{f();check(false,label);}catch(const std::invalid_argument&){check(true,label);}catch(...){check(false,label);}}}
 int main(){using namespace police::physics;PhysicsWorld w;w.add_static_box({{5,1,0},{1,1,1}});
 check(w.static_box_count()==1,"stores static collider");
-check(!w.overlaps({{3.5,1,0},{.5,.5,.5}},"touching faces are not penetrating");
+check(!w.overlaps({{3.5,1,0},{.5,.5,.5}}),"touching faces are not penetrating");
 check(w.overlaps({{4.6,1,0},{.5,.5,.5}}),"detects AABB penetration");
 {auto m=w.move_box({0,1,0},{.5,.5,.5},{10,0,0});check(m.hit_x,"reports blocked axis");check(std::abs(m.position.x-3.5)<1e-8,"prevents tunneling through wall");}
 {auto m=w.move_box({0,1,0},{.5,.5,.5},{0,0,5});check(!m.collided()&&std::abs(m.position.z-5)<1e-8,"unobstructed movement unchanged");}
